@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('register-form');
     const regEmail = document.getElementById('reg-email');
     const regPhone = document.getElementById('reg-phone');
-    const regPassword = document.getElementById('reg-password');
+    const regPasswordInput = document.getElementById('reg-password'); // Renamed for clarity
     const registerError = document.getElementById('register-error');
     
     // Payment Elements
@@ -24,23 +24,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // App Elements
     const matchList = document.getElementById('match-list');
     
-    // Navigation Links
+    // Navigation Links and Buttons
     const showLoginLink = document.getElementById('show-login');
     const showRegisterLink = document.getElementById('show-register');
+    const logoutButton = document.getElementById('logout-button');
+    const callButton = document.getElementById('call-button');
 
     // Utility Buttons
-    const logoutButton = document.getElementById('logout-button');
     const helpButton = document.getElementById('help-button');
-    const callButton = document.getElementById('call-button');
     const paymentMethodButton = document.getElementById('payment-method-button');
+
 
     // --- CONFIGURATION & STATE ---
     const FEE_AMOUNT = 1000;
     const PAYMENT_NUMBER = '0706535581';
     const NOTIFICATION_NUMBER = '0781346242';
     
+    const DEV_BYPASS_PASSWORD = 'devpass23'; 
+    const GENERATED_PIN_DEFAULT = '1234'; 
+    
     let registeredUser = null; 
-    let generatedPin = '1234'; // Default PIN for simulation
+    let generatedPin = GENERATED_PIN_DEFAULT; 
+
+    // --- 0. FOOTBALL API ENDPOINT SIMULATION ---
+    const FIXTURES_API_URL = 'https://api.jsonkeeper.com/b/DUMMY-FOOTBALL-FIXTURES'; 
+
 
     // --- 1. NAVIGATION CONTROL ---
     const navigateTo = (target) => {
@@ -62,6 +70,22 @@ document.addEventListener('DOMContentLoaded', () => {
         registeredUser = null;
         loginPin.value = '';
     });
+    
+    // Developer Bypass Function
+    const handleDevBypass = (enteredPassword) => {
+        if (enteredPassword === DEV_BYPASS_PASSWORD) {
+            alert("Developer access granted. Bypassing payment security.");
+            registeredUser = { 
+                email: 'ignatius@dev.com',
+                phone: NOTIFICATION_NUMBER, 
+                isPaid: true 
+            };
+            navigateTo(mainApp);
+            fetchUpcomingMatches();
+            return true;
+        }
+        return false;
+    }
 
 
     // --- 2. REGISTRATION FLOW ---
@@ -69,16 +93,18 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         registerError.textContent = '';
 
-        if (regPassword.value.length < 6) {
+        const enteredPassword = regPasswordInput.value;
+
+        if (handleDevBypass(enteredPassword)) return; // Check developer bypass first
+
+        if (enteredPassword.length < 6) {
             registerError.textContent = 'Password must be at least 6 characters.';
             return;
         }
 
-        // Store registration data locally (Simulated Database)
         registeredUser = {
             email: regEmail.value,
             phone: regPhone.value,
-            password: regPassword.value, // Not used for login, only payment pin is used
             isPaid: false
         };
 
@@ -86,10 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`REGISTRATION SUCCESS!
         
         Developer Notification (SIMULATED SMS to ${NOTIFICATION_NUMBER}): 
-        New User Registered: Email=${registeredUser.email}, Phone=${registeredUser.phone}. 
-        Status: Awaiting payment.`);
+        New User Registered: Phone=${registeredUser.phone}. 
+        Status: Awaiting Ksh 1000 payment.`);
 
-        // Proceed to Payment
         navigateTo(paymentGate);
     });
 
@@ -110,8 +135,12 @@ document.addEventListener('DOMContentLoaded', () => {
             navigateTo(registerGate);
             return;
         }
+        if (registeredUser.isPaid) {
+             alert("Payment already verified. Proceed to login.");
+             navigateTo(loginGate);
+             return;
+        }
 
-        // Simulate payment verification API call
         alert("Verification API Check: Please wait 3 seconds...");
         confirmPaymentButton.disabled = true;
 
@@ -130,12 +159,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // SIMULATED NOTIFICATION TO DEVELOPER
             alert(`Developer Notification (SIMULATED SMS to ${NOTIFICATION_NUMBER}): 
-            User Paid (Ksh 1000). Pin Sent: ${generatedPin}.`);
+            User Paid (Ksh 1000). User PIN Sent: ${generatedPin}.`);
             
             confirmPaymentButton.disabled = false;
             navigateTo(loginGate);
 
-        }, 3000); // 3 second verification delay
+        }, 3000); 
     });
 
 
@@ -144,14 +173,18 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         loginError.textContent = '';
         
-        if (!registeredUser || !registeredUser.isPaid) {
-             loginError.textContent = 'Registration or payment required.';
+        if (!registeredUser) {
+             loginError.textContent = 'Please register first.';
+             return;
+        }
+        if (!registeredUser.isPaid) {
+             loginError.textContent = 'Payment of Ksh 1000 is required to receive the login PIN.';
              return;
         }
         
         if (loginPin.value === generatedPin) {
             loginError.textContent = '';
-            alert("Login successful! Welcome back, Ignatius!");
+            alert("Login successful! Welcome back to guaranteed profits!");
             navigateTo(mainApp);
             fetchUpcomingMatches();
         } else {
@@ -159,42 +192,64 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- 5. FOOTBALL PREDICTION LOGIC ---
+    // --- 5. FOOTBALL PREDICTION LOGIC (Accurate Simulation) ---
 
-    /**
-     * SIMULATED API: Fetches upcoming football games.
-     * Uses dummy data to simulate the structure of a Football API response.
-     */
-    const fetchUpcomingMatches = () => {
-        matchList.innerHTML = '<p id="loading-matches" class="status-predicting">Fetching fixtures from fixed match server...</p>';
-
-        setTimeout(() => {
-            const matches = [
-                { home: 'Man United', away: 'Liverpool', time: 'Today 19:30', league: 'EPL' },
-                { home: 'Real Madrid', away: 'Barcelona', time: 'Tomorrow 21:00', league: 'La Liga' },
-                { home: 'Bayern Munich', away: 'Dortmund', time: 'Sat 16:30', league: 'Bundesliga' },
-                { home: 'Arsenal', away: 'Chelsea', time: 'Sun 18:00', league: 'EPL' },
-            ];
-
-            matchList.innerHTML = '';
-            matches.forEach(match => createMatchCard(match));
-        }, 2500);
+    const fetchFixturesAPI = async () => {
+        // --- SIMULATING REAL API FETCH ---
+        return new Promise(resolve => {
+            setTimeout(() => {
+                // This data simulates the daily updates from an external API
+                const dummyData = [
+                    { home: 'Manchester City', away: 'Aston Villa', time: 'Today 20:00', league: 'EPL', importance: 'HIGH' },
+                    { home: 'Paris SG', away: 'Lille', time: 'Today 18:00', league: 'Ligue 1', importance: 'MEDIUM' },
+                    { home: 'Bordeaux', away: 'Rennes', time: 'Tomorrow 15:00', league: 'Ligue 1', importance: 'LOW' },
+                    { home: 'Celtic', away: 'Rangers', time: 'Sat 12:30', league: 'Scottish Prem', importance: 'CRITICAL' },
+                    { home: 'AC Milan', away: 'Inter Milan', time: 'Sat 21:00', league: 'Serie A', importance: 'HIGH' },
+                ];
+                resolve(dummyData);
+            }, 2000); // 2 seconds simulated API wait time
+        });
     };
 
-    /**
-     * Generates a "fixed" (highly confident) prediction.
-     */
-    const predictFixedWinner = (home, away) => {
-        // 90% chance the Home team is the "fixed" winner for demonstration
-        const winner = Math.random() < 0.9 ? home : away;
+    const predictFixedWinner = (home, away, importance) => {
+        // HIGHLY CONFIDENT FIX PREDICTION LOGIC
+        
+        if (importance === 'CRITICAL') {
+            // Guarantee winner for key rivalry matches
+            return 'Celtic'; 
+        }
+        if (home === 'Manchester City' || home === 'AC Milan') {
+             // Guarantee winner for strong favorites (Fixed)
+             return home;
+        }
+        
+        // 95% chance the Home team is the "fixed" winner otherwise
+        const winner = Math.random() < 0.95 ? home : away;
+        
         return winner;
     };
 
-    /**
-     * Creates the HTML structure for a single match prediction.
-     */
+    const fetchUpcomingMatches = async () => {
+        matchList.innerHTML = '<p id="loading-matches" class="status-predicting"><i class="fas fa-spinner fa-spin"></i> Retrieving daily fixed fixtures from central server...</p>';
+
+        try {
+            const matches = await fetchFixturesAPI();
+            matchList.innerHTML = '';
+
+            if (matches.length === 0) {
+                 matchList.innerHTML = '<p class="status-ready">No fixed matches found for today.</p>';
+                 return;
+            }
+
+            matches.forEach(match => createMatchCard(match));
+
+        } catch (error) {
+            matchList.innerHTML = `<p class="error-message">Error connecting to the Fixed Match API: ${error.message}</p>`;
+        }
+    };
+
     const createMatchCard = (match) => {
-        const winner = predictFixedWinner(match.home, match.away);
+        const winner = predictFixedWinner(match.home, match.away, match.importance);
         
         const card = document.createElement('div');
         card.classList.add('match-card');
@@ -230,9 +285,10 @@ document.addEventListener('DOMContentLoaded', () => {
          alert(`REGISTRATION FEE: Ksh ${FEE_AMOUNT}. Payment number: ${PAYMENT_NUMBER}.`);
     });
 
-    helpButton.addEventListener('click', () => {
+    document.getElementById('help-button').addEventListener('click', () => {
          alert('HELP: Fixed predictions are posted daily. Use your unique PIN to log in after payment.');
     });
+
 
     // --- INITIALIZATION ---
     navigateTo(registerGate);
