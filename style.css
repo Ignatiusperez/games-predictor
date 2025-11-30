@@ -117,27 +117,36 @@ body {
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.1s;
+    transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
 }
 
 .cta-button:hover {
     background-color: #00e5e5;
+    box-shadow: 0 0 10px var(--highlight-blue);
 }
 
-/* Payment Specific Styling */
+.cta-button:active {
+    transform: scale(0.98);
+    box-shadow: 0 0 5px var(--highlight-blue);
+}
+
+/* Payment Specific Styling (Adjusted for glow) */
 .mpesa-button {
-    background-color: #e56012; /* M-Pesa Orange */
+    background-color: #e56012; 
     margin-bottom: 20px;
 }
 .mpesa-button:hover {
     background-color: #cc5610;
+    box-shadow: 0 0 10px #e56012;
 }
+
 .confirm-button {
     background-color: var(--highlight-green);
     color: var(--bg-dark);
 }
 .confirm-button:hover {
     background-color: #27c10b;
+    box-shadow: 0 0 10px var(--highlight-green);
 }
 
 
@@ -172,7 +181,7 @@ body {
     margin-left: 10px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 .utility-button i {
     margin-right: 5px;
@@ -180,6 +189,10 @@ body {
 .utility-button:hover {
     background-color: #2a2a2a;
     border-color: var(--highlight-blue);
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+}
+.utility-button:active {
+    background-color: #111;
 }
 
 /* Glowing Text */
@@ -276,23 +289,15 @@ body {
     border-radius: 8px;
     text-align: center;
     cursor: pointer;
-    transition: background-color 0.3s, border-color 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, transform 0.1s, box-shadow 0.3s;
     min-height: 100px;
 }
 
 .action-card:hover {
     background-color: #2a2a2a;
     border-color: var(--highlight-green);
-}
-
-.action-card h4 {
-    color: var(--highlight-green);
-    margin-bottom: 5px;
-}
-
-.action-card p {
-    font-size: 0.8rem;
-    color: var(--text-dim);
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.7);
+    transform: translateY(-2px);
 }
 
 .primary-action {
@@ -300,6 +305,7 @@ body {
 }
 .primary-action:hover {
     border-color: var(--highlight-green);
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
 }
 
 .app-footer {
