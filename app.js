@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('register-form');
     const regEmail = document.getElementById('reg-email');
     const regPhone = document.getElementById('reg-phone');
-    const regPasswordInput = document.getElementById('reg-password'); // Renamed for clarity
+    const regPasswordInput = document.getElementById('reg-password'); 
     const registerError = document.getElementById('register-error');
     
     // Payment Elements
@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const callButton = document.getElementById('call-button');
 
     // Utility Buttons
-    const helpButton = document.getElementById('help-button');
     const paymentMethodButton = document.getElementById('payment-method-button');
 
 
@@ -45,9 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let registeredUser = null; 
     let generatedPin = GENERATED_PIN_DEFAULT; 
-
-    // --- 0. FOOTBALL API ENDPOINT SIMULATION ---
-    const FIXTURES_API_URL = 'https://api.jsonkeeper.com/b/DUMMY-FOOTBALL-FIXTURES'; 
 
 
     // --- 1. NAVIGATION CONTROL ---
@@ -95,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const enteredPassword = regPasswordInput.value;
 
-        if (handleDevBypass(enteredPassword)) return; // Check developer bypass first
+        if (handleDevBypass(enteredPassword)) return; 
 
         if (enteredPassword.length < 6) {
             registerError.textContent = 'Password must be at least 6 characters.';
@@ -198,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- SIMULATING REAL API FETCH ---
         return new Promise(resolve => {
             setTimeout(() => {
-                // This data simulates the daily updates from an external API
                 const dummyData = [
                     { home: 'Manchester City', away: 'Aston Villa', time: 'Today 20:00', league: 'EPL', importance: 'HIGH' },
                     { home: 'Paris SG', away: 'Lille', time: 'Today 18:00', league: 'Ligue 1', importance: 'MEDIUM' },
@@ -215,11 +210,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // HIGHLY CONFIDENT FIX PREDICTION LOGIC
         
         if (importance === 'CRITICAL') {
-            // Guarantee winner for key rivalry matches
             return 'Celtic'; 
         }
         if (home === 'Manchester City' || home === 'AC Milan') {
-             // Guarantee winner for strong favorites (Fixed)
              return home;
         }
         
