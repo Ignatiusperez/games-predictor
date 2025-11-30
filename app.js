@@ -188,45 +188,59 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- 5. FOOTBALL PREDICTION LOGIC (Accurate Simulation) ---
+    // --- 5. FOOTBALL PREDICTION LOGIC (Accurate Simulation with Odds) ---
 
-    const fetchFixturesAPI = async () => {
+    const fetchBetikaOddsAPI = async () => {
         // --- SIMULATING REAL API FETCH ---
         return new Promise(resolve => {
             setTimeout(() => {
-                const dummyData = [
-                    { home: 'Manchester City', away: 'Aston Villa', time: 'Today 20:00', league: 'EPL', importance: 'HIGH' },
-                    { home: 'Paris SG', away: 'Lille', time: 'Today 18:00', league: 'Ligue 1', importance: 'MEDIUM' },
-                    { home: 'Bordeaux', away: 'Rennes', time: 'Tomorrow 15:00', league: 'Ligue 1', importance: 'LOW' },
-                    { home: 'Celtic', away: 'Rangers', time: 'Sat 12:30', league: 'Scottish Prem', importance: 'CRITICAL' },
-                    { home: 'AC Milan', away: 'Inter Milan', time: 'Sat 21:00', league: 'Serie A', importance: 'HIGH' },
+                // Data structure mimics an API response including odds
+                const dummyFixturesWithOdds = [
+                    { home: 'Manchester City', away: 'Aston Villa', time: 'Today 20:00', league: 'EPL', importance: 'HIGH', odds: { home: 1.35, draw: 5.50, away: 8.00 } },
+                    { home: 'Paris SG', away: 'Lille', time: 'Today 18:00', league: 'Ligue 1', importance: 'MEDIUM', odds: { home: 1.80, draw: 3.50, away: 4.20 } },
+                    { home: 'Bordeaux', away: 'Rennes', time: 'Tomorrow 15:00', league: 'Ligue 1', importance: 'LOW', odds: { home: 2.50, draw: 3.00, away: 2.80 } },
+                    { home: 'Celtic', away: 'Rangers', time: 'Sat 12:30', league: 'Scottish Prem', importance: 'CRITICAL', odds: { home: 2.10, draw: 3.20, away: 3.50 } },
+                    { home: 'AC Milan', away: 'Inter Milan', time: 'Sat 21:00', league: 'Serie A', importance: 'HIGH', odds: { home: 2.60, draw: 3.10, away: 2.70 } },
                 ];
-                resolve(dummyData);
-            }, 2000); // 2 seconds simulated API wait time
+                resolve(dummyFixturesWithOdds);
+            }, 2000); 
         });
     };
 
-    const predictFixedWinner = (home, away, importance) => {
+    const predictFixedWinner = (match) => {
         // HIGHLY CONFIDENT FIX PREDICTION LOGIC
         
-        if (importance === 'CRITICAL') {
-            return 'Celtic'; 
+        if (match.importance === 'CRITICAL') {
+            return { winner: 'Celtic', fixed_odd: '1.05 (Adjusted)' }; 
         }
-        if (home === 'Manchester City' || home === 'AC Milan') {
-             return home;
+        if (match.home === 'Manchester City' || match.home === 'AC Milan') {
+             return { winner: match.home, fixed_odd: '1.01 (Adjusted)' };
         }
         
-        // 95% chance the Home team is the "fixed" winner otherwise
-        const winner = Math.random() < 0.95 ? home : away;
+        // General prediction logic (guarantee home win for 95% of non-critical matches)
+        const winnerName = Math.random() < 0.95 ? match.home : match.away;
         
-        return winner;
+        // Find the corresponding winning odd from the simulated Betika data
+        let winningOdd = '1.20+';
+        if (winnerName === match.home) {
+            winningOdd = match.odds.home.toFixed(2);
+        } else if (winnerName === match.away) {
+            winningOdd = match.odds.away.toFixed(2);
+        }
+        
+        // If the odd is high, we simulate an *internal fix* lowering the true odd
+        if (parseFloat(winningOdd) > 3.0) {
+            winningOdd = '1.50 (Adjusted)';
+        }
+
+        return { winner: winnerName, fixed_odd: winningOdd };
     };
 
     const fetchUpcomingMatches = async () => {
-        matchList.innerHTML = '<p id="loading-matches" class="status-predicting"><i class="fas fa-spinner fa-spin"></i> Retrieving daily fixed fixtures from central server...</p>';
+        matchList.innerHTML = '<p id="loading-matches" class="status-predicting"><i class="fas fa-spinner fa-spin"></i> Querying Betika Odds API for daily fixed fixtures...</p>';
 
         try {
-            const matches = await fetchFixturesAPI();
+            const matches = await fetchBetikaOddsAPI();
             matchList.innerHTML = '';
 
             if (matches.length === 0) {
@@ -237,12 +251,12 @@ document.addEventListener('DOMContentLoaded', () => {
             matches.forEach(match => createMatchCard(match));
 
         } catch (error) {
-            matchList.innerHTML = `<p class="error-message">Error connecting to the Fixed Match API: ${error.message}</p>`;
+            matchList.innerHTML = `<p class="error-message">Error connecting to the Betika Prediction API: ${error.message}</p>`;
         }
     };
 
     const createMatchCard = (match) => {
-        const winner = predictFixedWinner(match.home, match.away, match.importance);
+        const prediction = predictFixedWinner(match);
         
         const card = document.createElement('div');
         card.classList.add('match-card');
@@ -250,9 +264,13 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="match-details">
                 <h4>${match.home} vs ${match.away}</h4>
                 <p>${match.league} | Kickoff: ${match.time}</p>
+                <p class="odds-display">
+                    Odds: Home ${match.odds.home.toFixed(2)} | Draw ${match.odds.draw.toFixed(2)} | Away ${match.odds.away.toFixed(2)}
+                </p>
             </div>
             <div class="prediction-result">
-                WIN: ${winner.split(' ')[0]}
+                WIN: ${prediction.winner.split(' ')[0]}
+                <small>@ ${prediction.fixed_odd}</small>
             </div>
         `;
         matchList.appendChild(card);
