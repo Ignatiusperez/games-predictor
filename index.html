@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ignatius Fixed Prediction</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+    <!-- 1. REGISTRATION GATE -->
+    <div class="auth-gate" id="register-gate">
+        <div class="auth-box registration-box">
+            <h2 class="logo-header">Ignatius Fixed Prediction</h2>
+            <p class="warning-text">Secure your spot. Registration Fee: Ksh 1000.</p>
+            
+            <form id="register-form">
+                <input type="email" id="reg-email" placeholder="Email" required>
+                <input type="tel" id="reg-phone" placeholder="Phone Number (e.g., 07XXXXXXXX)" required>
+                <input type="password" id="reg-password" placeholder="Password (Min 6 chars)" required>
+                <button type="submit" class="cta-button">Register & Proceed to Payment</button>
+            </form>
+            <p id="register-error" class="error-message"></p>
+            <p class="switch-link">Already registered? <a href="#" id="show-login">Sign In here.</a></p>
+        </div>
+    </div>
+    
+    <!-- 2. PAYMENT REQUIRED GATE -->
+    <div class="auth-gate hidden" id="payment-gate">
+        <div class="auth-box payment-box">
+            <h2 class="logo-header">Ksh 1000 Access Fee</h2>
+            <p class="payment-instruction">
+                Complete the Ksh 1000 payment to receive your unique login PIN via SMS.
+            </p>
+            <button class="cta-button mpesa-button" id="mpesa-info-button">
+                 <i class="fas fa-money-bill-wave"></i> Show Payment Details (M-Pesa)
+            </button>
+            
+            <button class="cta-button confirm-button" id="confirm-payment">I Have Paid - Verify Transaction</button>
+            <p class="error-message">Verification is instant upon payment confirmation.</p>
+        </div>
+    </div>
+
+    <!-- 3. LOGIN WITH PIN GATE -->
+    <div class="auth-gate hidden" id="login-gate">
+        <div class="auth-box login-pin-box">
+            <h2 class="logo-header">Enter Secure PIN</h2>
+            <p class="warning-text">A unique login PIN has been sent to your registered phone number (simulated SMS).</p>
+            
+            <form id="login-form">
+                <input type="text" id="login-pin" placeholder="Enter PIN from SMS" required>
+                <button type="submit" class="cta-button">Login</button>
+            </form>
+            <p id="login-error" class="error-message"></p>
+            <p class="switch-link">Need to register? <a href="#" id="show-register">Register now.</a></p>
+        </div>
+    </div>
+    
+    <!-- 4. MAIN PREDICTION APPLICATION -->
+    <div class="main-app hidden" id="main-app">
+
+        <header class="app-header">
+            <h1 class="app-title">Ignatius Fixed Predictions</h1>
+            <div class="header-actions">
+                <button class="utility-button" id="logout-button"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                <button class="utility-button" id="help-button"><i class="fas fa-question-circle"></i> Help</button>
+                <button class="utility-button" id="call-button"><i class="fas fa-phone"></i> Call Support</button>
+            </div>
+        </header>
+        
+        <div class="made-by">
+             <p class="glowing-text">Proudly Made by Ignatius</p>
+        </div>
+
+        <section class="prediction-area">
+            <h3>Upcoming Fixed Matches</h3>
+            <div class="match-list" id="match-list">
+                <!-- Matches injected here by JS -->
+                <p id="loading-matches" class="status-predicting">Fetching upcoming fixtures...</p>
+            </div>
+        </section>
+
+        <section class="actions-section">
+            <div class="actions-grid">
+                <button class="action-card" id="history-button">
+                    <h4><i class="fas fa-history"></i> History</h4>
+                    <p>View 100% win records.</p>
+                </button>
+                <button class="action-card primary-action" id="payment-method-button">
+                    <h4><i class="fas fa-credit-card"></i> Fee Info</h4>
+                    <p>Ksh 1000 Payment Details</p>
+                </button>
+                <button class="action-card" id="strategies-button">
+                    <h4><i class="fas fa-shield-alt"></i> Bet Safely</h4>
+                    <p>Guaranteed Profit Strategy.</p>
+                </button>
+            </div>
+        </section>
+        
+        <footer class="app-footer">
+            <p>Warning: Fixed match predictions are for entertainment only. Use at your own risk.</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
