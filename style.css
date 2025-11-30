@@ -254,6 +254,12 @@ body {
     color: var(--text-dim);
 }
 
+.odds-display {
+    font-size: 0.8rem;
+    color: #00ffff;
+    margin-top: 5px;
+}
+
 .prediction-result {
     font-family: 'Orbitron', sans-serif;
     font-size: 1.2rem;
@@ -265,6 +271,11 @@ body {
     text-align: center;
     text-shadow: 0 0 2px var(--bg-dark);
     box-shadow: 0 0 10px rgba(57, 255, 20, 0.7);
+}
+.prediction-result small {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 400;
 }
 
 .status-predicting {
